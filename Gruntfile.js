@@ -250,6 +250,12 @@ module.exports = function(grunt) {
                     dest: 'public/icons/'
                 },
                 {
+                    cwd: 'editor/js/awe.js',
+                    src: '**',
+                    expand: true,
+                    dest: 'public/js/awe.js/'
+                },
+                {
                     expand: true,
                     src: ['editor/index.html','editor/favicon.ico'],
                     dest: 'public/',

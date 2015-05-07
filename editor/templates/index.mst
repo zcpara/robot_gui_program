@@ -177,7 +177,155 @@
 <script src="vendor/vendor.js"></script>
 <script src="vendor/ace/ace.js"></script>
 <script src="vendor/ace/ext-language_tools.js"></script>
-<script src="red/red.min.js"></script>
+<script src="red/red.js"></script>
 
+<script type="text/javascript" src="./js/awe.js/awe-loader-min.js"></script>
+<script type="text/javascript">
+var socket = new WebSocket("ws://192.168.8.102:3000");
+var usingRemoteVideoStream = false;
+
+window.addEventListener('load', function() {
+window.awe.init({
+    device_type: awe.AUTO_DETECT_DEVICE_TYPE,
+    settings: {
+        container_id: 'chart',
+        default_camera_position: { x:0, y:0, z:0 },
+        default_lights:[
+            {
+              id: 'point_light',
+              type: 'point',
+              color: 0xFFFFFF,
+            },
+        ],
+    },
+    ready: function() {
+        awe.util.require([
+            {
+                capabilities: ['gum','webgl'],
+                files: [
+                    [ './js/awe.js/awe-standard-dependencies.js', './js/awe.js/awe-standard.js'],
+                    [ './js/awe.js/awe-standard-dependencies.js', './js/awe.js/awe-standard-object_clicked.js'],
+                    './js/awe.js/awe-jsartoolkit-dependencies.js',
+                    './js/awe.js/awe.marker_ar.js',
+                ],
+                success: function() {
+                    awe.setup_scene();
+
+                    awe.pois.add({ id:'poi_1', position: { x:0, y:0, z:10000 }, visible: false });
+
+                    var textContent = 'czhan';
+                    var resolution = measureTexture(textContent);
+                    awe.projections.add({
+                        id:'projection_1',
+                        //geometry: { shape: 'cube', x:120, y:120, z:120 },
+                        geometry: { shape: 'cube', x:resolution.width/4, y:0, z:resolution.width/4 },
+                        material:{ type: 'phong', color: 0xFFFFFF },
+                        //texture: { path: 'awe_by_buildAR.png' },
+                        texture: { text: textContent },
+                        rotation: {x:180, z:0},
+                        position: {x:100, y:100, z:0}
+                    }, { poi_id: 'poi_1' });
+
+                    window.addEventListener('object_clicked', function(e) {
+                        console.log('touch a projections'+JSON.stringify(e.detail.projection_id));
+                        for(var i in e.detail){
+                            console.log(i);
+                        }
+                    });
+
+                    awe.events.add([{
+                        id: 'ar_tracking_marker',
+                        device_types: {
+                            pc: 1,
+                            android: 1
+                        },
+                        register: function(handler) {
+                            window.addEventListener('ar_tracking_marker', handler, false);
+                        },
+                        unregister: function(handler) {
+                            window.removeEventListener('ar_tracking_marker', handler, false);
+                        },
+                        handler: function(event) {
+                            if (event.detail) {
+                                if (event.detail['64']) { // we are mapping marker #64 to this projection
+                                    awe.pois.update({
+                                        data: {
+                                            visible: true,
+                                            position: { x:0, y:0, z:0 },
+                                            matrix: event.detail['64'].transform
+                                        },
+                                        where: {
+                                            id: 'poi_1'
+                                        }
+                                    });
+                                } else {
+                                    awe.pois.update({
+                                        data: {
+                                            visible: false
+                                        },
+                                        where: {
+                                            id: 'poi_1'
+                                        }
+                                    });
+                                }
+                                awe.scene_needs_rendering = 1;
+                            }
+                        }
+                    }])
+                },
+            },
+            {
+                capabilities: [],
+                success: function() {
+		            document.body.innerHTML = '<p>Try this demo in the latest version of Chrome or Firefox on a PC or Android device</p>';
+                },
+            },
+        ]);
+    }
+});
+});
+
+function textToTexture(text) {
+    //create an HTML5 Canvas
+    var canvas = document.createElement("canvas");
+    canvas.width = 256;
+    canvas.height = 256;
+    var ctx = canvas.getContext('2d');
+    ctx.font = '32pt Helvetica';
+    var te = ctx.measureText(text);
+    var textWidth = parseInt(te.width);
+
+    var canvas = document.createElement("canvas");
+    canvas.width = textWidth+6;
+    canvas.height = 36;
+    var context = canvas.getContext('2d');
+
+    //draw transparent background
+    context.fillStyle = "rgba(0, 0, 255, 0.4)";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    context.fillStyle = "white";
+    context.font = '32pt Helvetica';
+
+    context.fillText(text, 0, 34);
+
+    //creat image data from the canvas
+    var newImageData = canvas.toDataURL();
+    return new arel.Image(newImageData, textWidth+6, 36, true);
+}
+
+function measureTexture(text) {
+    //create an HTML5 Canvas
+    var canvas = document.createElement("canvas");
+    canvas.width = 256;
+    canvas.height = 256;
+    var ctx = canvas.getContext('2d');
+    ctx.font = '32pt Helvetica';
+    var te = ctx.measureText(text);
+    var textWidth = parseInt(te.width);
+
+    return {width: textWidth+6, height:36};
+}
+</script>
 </body>
 </html>
