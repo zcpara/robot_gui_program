@@ -53,7 +53,7 @@
     <div id="workspace">
         <ul id="workspace-tabs"></ul>
         <div id="workspace-add-tab"><a id="btn-workspace-add-tab" href="#"><i class="fa fa-plus"></i></a></div>
-        <div id="chart"></div>
+        <div id="chart" style="background:transparent; overflow:hidden"></div>
         <div id="workspace-toolbar">
             <a class="button" id="workspace-subflow-edit" href="#"><i class="fa fa-pencil"></i> edit name</a>
             <a class="button disabled" id="workspace-subflow-add-input" href="#"><i class="fa fa-plus"></i> input</a>
@@ -62,13 +62,13 @@
         </div>
     </div>
 
-    <div id="chart-zoom-controls">
+    <!--div id="chart-zoom-controls">
         <div class="btn-group">
             <a class="btn btn-mini" id="btn-zoom-out" href="#"><i class="fa fa-search-minus"></i></a>
             <a class="btn btn-mini" id="btn-zoom-zero" href="#"><i class="fa fa-dot-circle-o"></i></a>
             <a class="btn btn-mini" id="btn-zoom-in" href="#"><i class="fa fa-search-plus"></i></a>
         </div>
-    </div>
+    </div-->
 
     <div id="sidebar">
         <ul id="sidebar-tabs"></ul>
@@ -179,10 +179,27 @@
 <script src="vendor/ace/ext-language_tools.js"></script>
 <script src="red/red.js"></script>
 
-<script type="text/javascript" src="./js/awe.js/awe-loader-min.js"></script>
+
 <script type="text/javascript">
-var socket = new WebSocket("ws://192.168.8.102:3000");
 var usingRemoteVideoStream = false;
+</script>
+
+<script type="text/javascript" src="./js/awe.js/awe-loader.js"></script>
+
+<!--script id="awe-js-head" type="text/javascript">
+</script-->
+
+<!--script type="text/javascript" src="./js/awe.js/awe-standard-dependencies.js"></script>
+<script type="text/javascript" src="./js/awe.js/awe-standard.js"></script>
+<script type="text/javascript" src="./js/awe.js/awe-standard-object_clicked.js"></script>
+<script type="text/javascript" src="./js/awe.js/awe-jsartoolkit-dependencies.js"></script>
+<script type="text/javascript" src="./js/awe.js/awe.marker_ar.js"></script-->
+
+
+<script type="text/javascript">
+if (usingRemoteVideoStream) {
+    var socket = new WebSocket("ws://192.168.8.102:3000");
+}
 
 window.addEventListener('load', function() {
 window.awe.init({
@@ -223,7 +240,7 @@ window.awe.init({
                         //texture: { path: 'awe_by_buildAR.png' },
                         texture: { text: textContent },
                         rotation: {x:180, z:0},
-                        position: {x:100, y:100, z:0}
+                        position: {x:0, y:0, z:0}
                     }, { poi_id: 'poi_1' });
 
                     window.addEventListener('object_clicked', function(e) {
@@ -233,6 +250,7 @@ window.awe.init({
                         }
                     });
 
+//setInterval(function(){console.log(awe.projections.view('projection_1').mesh.parent.position);}, 1000);
                     awe.events.add([{
                         id: 'ar_tracking_marker',
                         device_types: {
@@ -248,6 +266,14 @@ window.awe.init({
                         handler: function(event) {
                             if (event.detail) {
                                 if (event.detail['64']) { // we are mapping marker #64 to this projection
+                                    //console.log("event.detail['64'].transform="+JSON.stringify(event.detail['64'].transform));
+                                    //console.log('x:'+event.detail['64'].transform[12]+'y:'+event.detail['64'].transform[13]+'z:'+event.detail['64'].transform[14]);
+                                    var videoSize = $('#background_video_awe').width();
+                                    var objectX = event.detail['64'].transform[12]+$('#background_video_awe').width()/2;//+$('#awe_canvas-0').position().left;
+                                    var objectY = -event.detail['64'].transform[13]+$('#background_video_awe').height()/2;//+$('#awe_canvas-0').position().top;
+                                    console.log('object position='+objectX+', '+objectY);
+                                    document.getElementById('svg_cycle_1').setAttribute('cx', objectX);
+                                    document.getElementById('svg_cycle_1').setAttribute('cy', objectY);
                                     awe.pois.update({
                                         data: {
                                             visible: true,

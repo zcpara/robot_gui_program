@@ -88,7 +88,7 @@ RED.view = (function() {
                 return;
             }
             if (lasso) {
-                outer_background.attr("fill","#fff");
+                //outer_background.attr("fill","#fff");
             }
             canvasMouseUp.call(this);
         })
@@ -191,10 +191,10 @@ RED.view = (function() {
                 }
         });
 
-    var outer_background = vis.append('svg:rect')
-        .attr('width', space_width)
-        .attr('height', space_height)
-        .attr('fill','#fff');
+    //var outer_background = vis.append('svg:rect')
+    //    .attr('width', space_width)
+    //    .attr('height', space_height)
+    //    .attr('fill','#fff');
 
     //var gridScale = d3.scale.linear().range([0,2000]).domain([0,2000]);
     //var grid = vis.append('g');

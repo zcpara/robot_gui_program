@@ -29,25 +29,40 @@
       awe.pov().aspect = aspect_ratio;
     }
     else {  
-      var aspect_ratio = width / height,
-        h, w;
-      if (window.innerHeight > window.innerWidth) {
+      var aspect_ratio = width / height, h, w;
+      /*if (window.innerHeight > window.innerWidth) {
         h = window.innerHeight;
         w = h * aspect_ratio;
       }
       else {
         w = window.innerWidth;
         h = w / aspect_ratio;
+      }*/
+      if ($("#chart").height() > $("#chart").width()) {
+        h = $("#chart").height();
+        w = h * aspect_ratio;
       }
+      else {
+        w = $("#chart").width();
+        h = w / aspect_ratio;
+      }
+      if (h>$("#chart").height()) {
+        h = $("#chart").height();
+        w = h * aspect_ratio;
+      } else if (w > $("#chart").width()) {
+        w = $("#chart").width();
+        h = w / aspect_ratio;
+      }
+      console.log('actual size'+w+';'+h);
       if (background_video) {
         background_video.setAttribute('height', h);
         background_video.setAttribute('width', w);
-        background_video.style.marginLeft = -w/2 + 'px';
-        background_video.style.left = '50%';
+        //background_video.style.marginLeft = -w/2 + 'px';
+        //background_video.style.left = '50%';
       }
       awe.renderer().setSize(w, h);
-      awe.renderer().domElement.style.left = '50%';
-      awe.renderer().domElement.style.marginLeft = -w/2 + 'px';
+      //awe.renderer().domElement.style.left = '50%';
+      //awe.renderer().domElement.style.marginLeft = -w/2 + 'px';
       awe.pov().aspect = aspect_ratio;
     }
     awe.pov().updateProjectionMatrix();
@@ -120,14 +135,20 @@
         video.width = width;
         video.height = height;
         background_video = document.createElement('video');
-        background_video.setAttribute('width', window.innerWidth);
-        background_video.setAttribute('height', window.innerHeight);
+        console.log('chart size='+$("#chart").width()+';'+$("#chart").height());
+        //background_video.setAttribute('width', window.innerWidth);
+        background_video.setAttribute('width', $("#chart").width());
+        //background_video.setAttribute('height', window.innerHeight);
+        background_video.setAttribute('height', $("#chart").height());
         background_video.setAttribute('autoplay', 'true');
+        background_video.setAttribute('id', 'background_video_awe');
         background_video.style.position = 'absolute';
         background_video.style.left = '0px';
         background_video.style.top = '0px';
         background_video.style.zIndex = '-1';
         //container.appendChild(background_video);
+        background_video.setAttribute('tagtag', "czhan25");
+        document.getElementById('chart').appendChild(background_video);
         awe.util.connect_stream_to_src(video_stream.stream, background_video);
         background_video.addEventListener('play', function(){
           resize_video();
@@ -152,7 +173,7 @@
         if (!tracking_enabled) {
           return;
         }
-        var video = video_stream.video_element;
+        var video = background_video; //video_stream.video_element;
         if (!video) {
           return;
         }
@@ -166,6 +187,7 @@
         } catch(e) { /* TODO */ }
         canvas.changed = true;
         var detected_count = detector.detectMarkerLite(raster, threshold);
+        console.log("detected_count="+detected_count);
         var event_data = {};
         for (var i=0; i<detected_count; i++) {
           var id = detector.getIdMarkerData(i);

@@ -21,7 +21,8 @@
               var camera = awe.pov();
               mouse.x = (e.clientX/window.innerWidth) * 2 - 1;
               // Add by czhan25, temporary solution
-              mouse.y = -((e.clientY-100)/window.innerHeight) * 2 + 1;
+              //mouse.y = -((e.clientY-100)/window.innerHeight) * 2 + 1;
+              mouse.y = -(e.clientY/window.innerHeight) * 2 + 1;
               var mouse_vector = new THREE.Vector3(mouse.x, mouse.y, 1);
               projector.unprojectVector(mouse_vector, camera); 
               var direction = mouse_vector.sub(camera.position).normalize();

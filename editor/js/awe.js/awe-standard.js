@@ -24,6 +24,9 @@
 	THE SOFTWARE.
 
 */
+
+console.log('usingRemoteVideoStream='+usingRemoteVideoStream);
+if (usingRemoteVideoStream) {
 // Begin to get remote video stream
 
 // 仅仅用于控制哪一端的浏览器发起offer，#号后面有值的一方发起
@@ -124,6 +127,7 @@ socket.onmessage = function(event){
     }
 };
 // end of get remote video stream
+}
 
 (function(window) {
   var this_awe;
@@ -172,6 +176,7 @@ socket.onmessage = function(event){
           renderer.setSize(window.outerWidth, window.outerHeight);
           var awe_canvas = renderer.domElement;
           awe_canvas.id = 'awe_canvas-'+l;
+          awe_canvas.style.zIndex = '-1';
           if (this_awe.settings.view('canvas_style')) {
             try {
               for (var i in this_awe.settings.view('canvas_style')) {
@@ -451,6 +456,7 @@ socket.onmessage = function(event){
         var projection = this_awe.projections.view(projection_name);
         var origin_position = projection.mesh.parent.position;
         var projection_position = projection.mesh.position;
+        console.log('projection_position='+projection_position);
         var position = {};
         for (var p in origin_position) {
           position[p] = origin_position[p]+projection_position[p];
