@@ -181,7 +181,7 @@
 
 
 <script type="text/javascript">
-var usingRemoteVideoStream = false;
+var usingRemoteVideoStream = true;
 </script>
 
 <script type="text/javascript" src="./js/awe.js/awe-loader.js"></script>

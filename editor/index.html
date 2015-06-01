@@ -173,5 +173,38 @@
 <script src="vendor/ace/ext-language_tools.js"></script>
 <script src="red/red.min.js"></script>
 
+<script type="text/javascript">
+            $(function() {
+                $('.target').click(function(e) {
+                    if (e.ctrlKey) {
+                        console.log('control click');
+                    } else if (e.shiftKey) {
+                        console.log('shift click');
+                    } else {
+                        console.log('regular click');
+                    }
+                }).mousedown(function(e) {console.log('mousedown', e);})
+                .mouseup(function(e) { console.log('mouseup', e); });
+ 
+                $('button').click(function() {
+                    if($(this).hasClass('drag')) {
+                        $('.target').simulate('drag', {dx: 100, dy: 50});
+                    } else if($(this).hasClass('ctrl')) {
+                        $('.target').simulate('click', {ctrlKey: true});
+                    } else if($(this).hasClass('shift')) {
+                        $('.target').simulate('click', {shiftKey: true});
+                    } else {
+                        $('.target').simulate('click');
+                    }
+                });
+            });
+        </script>
+<div class="target" style="background-color: yellow; height: 300px; width: 500px">Test Target</div>
+        <div>
+            <button class="ctrl">Ctrl Click</button>
+            <button class="shift">Shift Click</button>
+            <button class="regular">Regular Click</button>
+            <button class="drag">Drag</button>
+        </div>
 </body>
 </html>

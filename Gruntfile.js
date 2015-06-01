@@ -129,7 +129,8 @@ module.exports = function(grunt) {
                         "editor/vendor/jquery/js/jquery.ui.touch-punch.min.js",
                         "editor/vendor/marked/marked.min.js",
                         "editor/vendor/orion/built-editor.min.js",
-                        "editor/vendor/d3/d3.v3.min.js"
+                        "editor/vendor/d3/d3.v3.min.js",
+                        "editor/vendor/jquery-ui/external/jquery-simulate/jquery.simulate.js"
                     ],
                     "public/vendor/vendor.css": [
                         "editor/vendor/orion/built-editor.css"
