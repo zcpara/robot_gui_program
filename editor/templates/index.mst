@@ -181,25 +181,17 @@
 
 
 <script type="text/javascript">
-var usingRemoteVideoStream = true;
+var usingRemoteVideoStream = false;
 </script>
 
 <script type="text/javascript" src="./js/awe.js/awe-loader.js"></script>
-
-<!--script id="awe-js-head" type="text/javascript">
-</script-->
-
-<!--script type="text/javascript" src="./js/awe.js/awe-standard-dependencies.js"></script>
-<script type="text/javascript" src="./js/awe.js/awe-standard.js"></script>
-<script type="text/javascript" src="./js/awe.js/awe-standard-object_clicked.js"></script>
-<script type="text/javascript" src="./js/awe.js/awe-jsartoolkit-dependencies.js"></script>
-<script type="text/javascript" src="./js/awe.js/awe.marker_ar.js"></script-->
-
 
 <script type="text/javascript">
 if (usingRemoteVideoStream) {
     var socket = new WebSocket("ws://192.168.8.102:3000");
 }
+
+var objectX_track = 10, objectY_track = 10;
 
 window.addEventListener('load', function() {
 window.awe.init({
@@ -250,7 +242,6 @@ window.awe.init({
                         }
                     });
 
-//setInterval(function(){console.log(awe.projections.view('projection_1').mesh.parent.position);}, 1000);
                     awe.events.add([{
                         id: 'ar_tracking_marker',
                         device_types: {
@@ -265,15 +256,27 @@ window.awe.init({
                         },
                         handler: function(event) {
                             if (event.detail) {
+                                //console.log("detection data:"+JSON.stringify(event.detail));
                                 if (event.detail['64']) { // we are mapping marker #64 to this projection
                                     //console.log("event.detail['64'].transform="+JSON.stringify(event.detail['64'].transform));
                                     //console.log('x:'+event.detail['64'].transform[12]+'y:'+event.detail['64'].transform[13]+'z:'+event.detail['64'].transform[14]);
                                     var videoSize = $('#background_video_awe').width();
                                     var objectX = event.detail['64'].transform[12]+$('#background_video_awe').width()/2;//+$('#awe_canvas-0').position().left;
                                     var objectY = -event.detail['64'].transform[13]+$('#background_video_awe').height()/2;//+$('#awe_canvas-0').position().top;
-                                    console.log('object position='+objectX+', '+objectY);
-                                    document.getElementById('svg_cycle_1').setAttribute('cx', objectX);
-                                    document.getElementById('svg_cycle_1').setAttribute('cy', objectY);
+                                    objectX_track = objectX;
+                                    objectY_track = objectY;
+                                    //console.log('object position='+objectX+', '+objectY);
+                                    if (newDOMID != null) {
+                                        //$('#'+newDOMID).simulate('click');
+                                        console.log('object position='+(objectX_track-mouseX)+', '+(objectY_track-mouseY));
+                                        //$('#'+newDOMID).simulate('drag', {dx: objectX_track-mouseX, dy: objectY_track-mouseY});
+                                        //$('#'+newDOMID).simulate('drag', {dx: 10, dy: 10});
+                                        //d3.select("#chart svg g g g rect").simulate('drag', {dx: 10, dy: 10});
+                                        $(d3.selectAll("#chart svg g g g rect")[0][2]).simulate('drag', {dx: 10, dy: 10});
+                                        //document.getElementById(newDOMID).setAttribute('transform', 'translate('+objectX_track+','+objectY_track+')');
+                                    }
+                                    //document.getElementById('svg_cycle_1').setAttribute('cx', objectX);
+                                    //document.getElementById('svg_cycle_1').setAttribute('cy', objectY);
                                     awe.pois.update({
                                         data: {
                                             visible: true,
@@ -352,6 +355,30 @@ function measureTexture(text) {
 
     return {width: textWidth+6, height:36};
 }
+
+var mouseX, mouseY;
+document.onmousemove = function(e) {
+    if (e.pageX || e.pageY) {
+        mouseX = e.pageX;
+        mouseY = e.pageY;
+    } else {
+        mouseX = e.clientX + document.body.scrollLeft - document.body.clientLeft;
+        mouseY = e.clientY + document.body.scrollTop - document.body.clientTop;
+    }
+};
+
+$('#palette_node_inject').simulate('drag', {dx: 200, dy: 100});
+var newDOMID = null;
+window.addEventListener("newDOMEvent", function(e) {
+    console.log("czhan25"+e.detail);
+    newDOMID = e.detail;
+    //$('#'+e.detail).simulate('click');
+    //d3.select("#"+e.detail).
+    //d3.select("#chart svg g g g rect").simulate('drag', {dx: objectX_track-mouseX, dy: objectY_track-mouseY});
+    $(d3.selectAll("#chart svg g g g rect")[0][2]).simulate('drag', {dx: objectX_track-mouseX, dy: objectY_track-mouseY});
+    //$('#'+e.detail).simulate('drag', {dx: objectX_track-mouseX, dy: objectY_track-mouseY});
+    //document.getElementById(e.detail).setAttribute('transform', 'translate('+objectX_track+','+objectY_track+')');
+}, false);
 </script>
 </body>
 </html>

@@ -303,6 +303,7 @@ RED.view = (function() {
             drop: function( event, ui ) {
                 d3.event = event;
                 var selected_tool = ui.draggable[0].type;
+                console.log("selected_tool="+selected_tool);
                 
                 var m = /^subflow:(.+)$/.exec(selected_tool);
                 
@@ -325,7 +326,13 @@ RED.view = (function() {
                 mousePos[1] /= scaleFactor;
                 mousePos[0] /= scaleFactor;
                 
-                var nn = { id:(1+Math.random()*4294967295).toString(16),x: mousePos[0],y:mousePos[1],w:node_width,z:RED.workspaces.active()};
+                var propagateID = (1+Math.random()*4294967295).toString(16);
+                //var newDOMEvent = new CustomEvent("newDOMEvent", {"DOMID":propagateID});
+                //window.dipatchEvent(newDOMEvent);
+                var newDOMEvent = new CustomEvent('newDOMEvent', { detail: propagateID });
+                window.dispatchEvent(newDOMEvent);  
+
+                var nn = { id:propagateID,x: mousePos[0],y:mousePos[1],w:node_width,z:RED.workspaces.active()};
                 
                 nn.type = selected_tool;
                 nn._def = RED.nodes.getType(nn.type);
@@ -485,6 +492,7 @@ RED.view = (function() {
                 );
             d3.event.preventDefault();
         } else if (mouse_mode == RED.state.MOVING) {
+            console.log("RED.state.MOVING");
             mousePos = d3.mouse(document.body);
             if (isNaN(mousePos[0])) {
                 mousePos = d3.touches(document.body)[0];
@@ -495,6 +503,7 @@ RED.view = (function() {
                 clickElapsed = 0;
             }
         } else if (mouse_mode == RED.state.MOVING_ACTIVE || mouse_mode == RED.state.IMPORT_DRAGGING) {
+            console.log("RED.state.MOVING_ACTIVE");
             mousePos = mouse_position;
             var node;
             var i;
